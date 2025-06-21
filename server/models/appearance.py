@@ -1,4 +1,4 @@
-from app import db
+from server.app import db
 
 class Appearance(db.Model):
     id = db.Column(db.Integer, primary_key=True)

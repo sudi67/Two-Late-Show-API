@@ -1,45 +1,32 @@
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required
-from app import db
-from models.episode import Episode
-from models.appearance import Appearance
+from server.app import db
+from server.models.episode import Episode
+from server.models.appearance import Appearance
 
 episode_bp = Blueprint('episode', __name__)
 
-@episode_bp.route('/episodes', methods=['GET'])
-def list_episodes():
+@episode_bp.route('/', methods=['GET'])
+def get_episodes():
     episodes = Episode.query.all()
-    result = []
-    for ep in episodes:
-        result.append({
-            'id': ep.id,
-            'date': ep.date.isoformat(),
-            'number': ep.number
-        })
-    return jsonify(result), 200
+    episodes_list = [{"id": ep.id, "date": ep.date.isoformat(), "number": ep.number} for ep in episodes]
+    return jsonify(episodes_list)
 
-@episode_bp.route('/episodes/<int:id>', methods=['GET'])
+@episode_bp.route('/<int:id>', methods=['GET'])
 def get_episode(id):
-    ep = Episode.query.get_or_404(id)
+    episode = Episode.query.get_or_404(id)
     appearances = Appearance.query.filter_by(episode_id=id).all()
-    appearances_list = []
-    for app in appearances:
-        appearances_list.append({
-            'id': app.id,
-            'rating': app.rating,
-            'guest_id': app.guest_id
-        })
+    appearances_list = [{"id": app.id, "rating": app.rating, "guest_id": app.guest_id} for app in appearances]
     return jsonify({
-        'id': ep.id,
-        'date': ep.date.isoformat(),
-        'number': ep.number,
-        'appearances': appearances_list
-    }), 200
+        "id": episode.id,
+        "date": episode.date.isoformat(),
+        "number": episode.number,
+        "appearances": appearances_list
+    })
 
-@episode_bp.route('/episodes/<int:id>', methods=['DELETE'])
-@jwt_required()
+@episode_bp.route('/<int:id>', methods=['DELETE'])
 def delete_episode(id):
-    ep = Episode.query.get_or_404(id)
-    db.session.delete(ep)
+    episode = Episode.query.get_or_404(id)
+    Appearance.query.filter_by(episode_id=id).delete()
+    db.session.delete(episode)
     db.session.commit()
-    return jsonify({'msg': 'Episode and related appearances deleted'}), 200
+    return jsonify({"msg": "Episode and appearances deleted"}), 200
