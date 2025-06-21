@@ -24,3 +24,17 @@ def create_appearance():
     db.session.commit()
 
     return jsonify({'msg': 'Appearance created', 'id': appearance.id}), 201
+
+@appearance_bp.route('/episode/<int:episode_id>', methods=['GET'])
+def get_appearances_by_episode(episode_id):
+    appearances = Appearance.query.filter_by(episode_id=episode_id).all()
+    result = []
+    for app in appearances:
+        guest = Guest.query.get(app.guest_id)
+        result.append({
+            'id': app.id,
+            'rating': app.rating,
+            'guest_id': app.guest_id,
+            'guest_name': guest.name if guest else None
+        })
+    return jsonify(result)

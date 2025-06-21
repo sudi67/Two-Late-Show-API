@@ -15,7 +15,15 @@ def get_episodes():
 def get_episode(id):
     episode = Episode.query.get_or_404(id)
     appearances = Appearance.query.filter_by(episode_id=id).all()
-    appearances_list = [{"id": app.id, "rating": app.rating, "guest_id": app.guest_id} for app in appearances]
+    appearances_list = []
+    for app in appearances:
+        guest = Guest.query.get(app.guest_id)
+        appearances_list.append({
+            "id": app.id,
+            "rating": app.rating,
+            "guest_id": app.guest_id,
+            "guest_name": guest.name if guest else None
+        })
     return jsonify({
         "id": episode.id,
         "date": episode.date.isoformat(),
