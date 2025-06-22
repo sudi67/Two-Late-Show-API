@@ -22,10 +22,10 @@ def create_app():
     from server.controllers.appearance_controller import appearance_bp
     from server.controllers.main_controller import main_bp
 
-    app.register_blueprint(auth_bp, url_prefix='/api')
-    app.register_blueprint(guest_bp, url_prefix='/api/guests')
-    app.register_blueprint(episode_bp, url_prefix='/api/episodes')
-    app.register_blueprint(appearance_bp, url_prefix='/api/appearances')
-    app.register_blueprint(main_bp)
+    app.register_blueprint(auth_bp, url_prefix='/')
+    app.register_blueprint(guest_bp, url_prefix='/guests')
+    app.register_blueprint(episode_bp, url_prefix='/episodes')
+    app.register_blueprint(appearance_bp, url_prefix='/appearances')
+    app.register_blueprint(main_bp, url_prefix='/')
 
     return app
